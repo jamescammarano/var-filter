@@ -5,22 +5,9 @@
 To keep the variable array clean I run a function `onMount(...)` which checks the tree against the variable array.
 Otherwise everything the user inputs, even accidentally, stays in the variable array forever.
 
-Another change from the original proposal is changing the variable object to
+Another change from the original proposal is changing the variable object to be able to load the correct type comparators.
 
-```javascript
-{
-	variables: {
-		__var__: {
-			type: "boolean",
-			value: "bar"
-		}
-	}
-}
-```
-
-In order to be able to load the correct type comparators.
-
-## The dropdown:
+<!-- ## The dropdown: -->
 
 <!-- pic -->
 
@@ -57,7 +44,7 @@ In order to be able to load the correct type comparators.
 };
 ```
 
-## Diff w/ system-filter
+<!-- ## Diff w/ system-filter
 
 **system-filter.vue**
 
@@ -67,7 +54,7 @@ In order to be able to load the correct type comparators.
 
 **types**
 
-**utils**
+**utils** -->
 
 ## To Do
 
@@ -79,18 +66,9 @@ In order to be able to load the correct type comparators.
   - Add {type} to the variables object
 - Migrate from `__var__ `to `__var` because vars can contain \_\_ in the middle
 
-## Tests
-
-Tests are written for the filter parser, except the `_else` check. All utils and other functions do not currently have
-tests written.
-
 ## Expanding the idea
 
 Rijk:
 
 > Doing it in-depth for every time you use validation (instead of just insight panels) might get a little more tricky,
 > but also opens up the door for usage in flows / fields / etc
-
-## Possible Changes
-
-- Could probably just say \_tag
