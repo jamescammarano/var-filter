@@ -108,7 +108,7 @@
 							/>
 						</span>
 					</div>
-					<!-- <nodes
+					<nodes
 						:filter="element[filterInfo[index].name]"
 						:collection="collection"
 						:depth="depth + 1"
@@ -116,7 +116,7 @@
 						@change="$emit('change')"
 						@remove-node="$emit('remove-node', [`${index}.${filterInfo[index].name}`, ...$event])"
 						@update:filter="replaceNode(index, { [filterInfo[index].name]: $event })"
-					/> -->
+					/>
 				</div>
 				<div v-else class="node conditional">
 					<div v-if="!filterInfo[index].isThen" class="header" :class="{ inline }">
