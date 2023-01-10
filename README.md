@@ -8,9 +8,9 @@ Otherwise everything the user inputs, even accidentally, stays in the variable a
 Another change from the original proposal is changing the variable object to be able to load the correct type
 comparators.
 
-<!-- ## The dropdown: -->
 
-<!-- pic -->
+https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-9c29-906b073000f5.mov
+
 
 ## The shape of Filter
 
