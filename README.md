@@ -45,18 +45,6 @@ https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-
 };
 ```
 
-<!-- ## Diff w/ system-filter
-
-**system-filter.vue**
-
-**nodes.vue**
-
-**input-group.vue**
-
-**types**
-
-**utils** -->
-
 ## To Do
 
 - Support multiple `_elseIf` statements by incrementing `_elseIf_#`
