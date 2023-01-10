@@ -5,7 +5,8 @@
 To keep the variable array clean I run a function `onMount(...)` which checks the tree against the variable array.
 Otherwise everything the user inputs, even accidentally, stays in the variable array forever.
 
-Another change from the original proposal is changing the variable object to be able to load the correct type comparators.
+Another change from the original proposal is changing the variable object to be able to load the correct type
+comparators.
 
 <!-- ## The dropdown: -->
 
@@ -65,6 +66,7 @@ Another change from the original proposal is changing the variable object to be 
 - Support finding type of `__var__`
   - Add {type} to the variables object
 - Migrate from `__var__ `to `__var` because vars can contain \_\_ in the middle
+- Update parser and tests to use the new variable format.
 
 ## Expanding the idea
 
