@@ -8,9 +8,7 @@ Otherwise everything the user inputs, even accidentally, stays in the variable a
 Another change from the original proposal is changing the variable object to be able to load the correct type
 comparators.
 
-
 https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-9c29-906b073000f5.mov
-
 
 ## The shape of Filter
 
@@ -51,6 +49,7 @@ https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-
 - Fix console error on v-list-group
 - bug: replacing the field with `__var__` right away is bad
   - maybe replace it on save?
+- bug: allow nesting under conditionals. I think it's looking for the comparator under it but there isn't one.
 - Support finding type of `__var__`
   - Add {type} to the variables object
 - Migrate from `__var__ `to `__var` because vars can contain \_\_ in the middle
