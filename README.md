@@ -1,4 +1,4 @@
-#  Adding conditionals / Filtering on variables via custom interface
+# Adding conditionals / Filtering on variables via custom interface
 
 [Original Proposal](https://gist.github.com/jamescammarano/756f6d62dbfc8b553f3780f85aea61b6)
 
@@ -43,11 +43,19 @@ https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-
 };
 ```
 
-## To Do: See [Issues](https://github.com/jamescammarano/var-filter/issues)
+## Parsing the object
+
+The parser is found in `shared/` because I was sharing it with other extensions in a different repository. It currently
+only parses the root level. I also need to add all comparators to `evaluateBranch(...)`.
+
+## To Do:
+
+See [Issues](https://github.com/jamescammarano/var-filter/issues)
 
 ## Providing feedback:
 
-If you want to provide feedback on something that doesn't have an issue use [Discussions](https://github.com/jamescammarano/var-filter/discussions)
+If you want to provide feedback on something that doesn't have an issue use
+[Discussions](https://github.com/jamescammarano/var-filter/discussions)
 
 ## Expanding the idea
 
