@@ -1,4 +1,4 @@
-# Variable Filter
+#  Adding conditionals / Filtering on variables via custom interface
 
 [Original Proposal](https://gist.github.com/jamescammarano/756f6d62dbfc8b553f3780f85aea61b6)
 
