@@ -43,17 +43,11 @@ https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-
 };
 ```
 
-## To Do
+## To Do: See [Issues](https://github.com/jamescammarano/var-filter/issues)
 
-- Support multiple `_elseIf` statements by incrementing `_elseIf_#`
-- Fix console error on v-list-group
-- bug: replacing the field with `__var__` right away is bad
-  - maybe replace it on save?
-- bug: allow nesting under conditionals. I think it's looking for the comparator under it but there isn't one.
-- Support finding type of `__var__`
-  - Add {type} to the variables object
-- Migrate from `__var__ `to `__var` because vars can contain \_\_ in the middle
-- Update parser and tests to use the new variable format.
+## Providing feedback:
+
+If you want to provide feedback on something that doesn't have an issue use [Discussions](https://github.com/jamescammarano/var-filter/discussions)
 
 ## Expanding the idea
 
