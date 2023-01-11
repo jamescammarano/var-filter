@@ -122,7 +122,7 @@ import {
 
 import { Filter } from './types';
 import { getNodeName } from './utils';
-import { REGEX_BETWEEN_HANDLEBARS, REGEX_BETWEEN_UNDERSCORES } from './consts';
+import { REGEX_BETWEEN_HANDLEBARS } from './consts';
 
 import Nodes from './nodes.vue';
 import { TYPES } from '@directus/shared/constants';
@@ -279,10 +279,8 @@ function emitValue() {
 
 function setVariablesArray(variable: string) {
 	const match = variable.match(REGEX_BETWEEN_HANDLEBARS);
-	if (match) variables.value[`__${match[1]}__`] = variable;
+	if (match) variables.value[`_${match[1]}`] = variable;
 }
-
-function updateKey() {}
 
 function removeUnusedVars() {
 	// how to remove unused variables but check if used else where?
@@ -292,12 +290,12 @@ function removeUnusedVars() {
 	const { _and, variables } = props.value;
 	const usedVariables = {};
 
-	const matchedVariables = JSON.stringify(_and).matchAll(REGEX_BETWEEN_UNDERSCORES);
+	const matchedVariables = JSON.stringify(_and).matchAll(/"_([^)]+)",/);
 
 	if (matchedVariables === null) return;
 
 	for (const variable in matchedVariables) {
-		usedVariables[`__${variable}__`] = `{{ variable }}`;
+		usedVariables[`_${variable}`] = `{{ ${variable} }}`;
 	}
 
 	variables.value = usedVariables;

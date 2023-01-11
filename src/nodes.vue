@@ -195,8 +195,8 @@ import {
 } from '@directus/shared/dist/esm/types';
 
 import { CondtionalElseFilter, CondtionalElseIfFilter, CondtionalIfFilter, Filter, FilterInfo } from './types';
-import { extractFieldFromFunction, fieldToFilter, getComparator, getField, getFieldType, getNodeName } from './utils';
-import { REGEX_BETWEEN_HANDLEBARS, REGEX_BETWEEN_UNDERSCORES } from './consts';
+import { extractFieldFromFunction, fieldToFilter, getComparator, getField, getNodeName } from './utils';
+import { CONDITIONALS, LOGIC, REGEX_BETWEEN_HANDLEBARS } from './consts';
 import InputGroup from './inputs/input-group.vue';
 import inputComponent from './inputs/input-component.vue';
 
@@ -233,10 +233,10 @@ const filterInfo = computed<FilterInfo[]>({
 		return props.filter.map((node, id) => {
 			const name = getNodeName(node);
 
-			const isVarField = name.startsWith('$var') || name.match(REGEX_BETWEEN_UNDERSCORES) !== null;
 			const isField = name.startsWith('_') === false;
-			const isLogic = ['_and', '_or'].includes(name);
+			const isLogic = LOGIC.includes(name);
 			const isThen = name === '_then';
+			const isVarField = name.startsWith('$var') || (!isField && !isLogic && !CONDITIONALS.includes(name));
 			const isUnsetVar = isVarField && name?.match(REGEX_BETWEEN_HANDLEBARS) === null;
 
 			return isField
@@ -489,7 +489,7 @@ function setVarName(index: number, value: string) {
 
 	if (match !== null && match[1]) {
 		emit('variable', variable.value);
-		filterInfo[index].name = '__' + match[1].trim() + '__';
+		filterInfo[index].name = '_' + match[1].trim();
 	}
 }
 </script>
