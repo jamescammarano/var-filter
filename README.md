@@ -17,13 +17,13 @@ https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-
     _and: [
 				{
 					_if: {
-						_and: [{ __method__: { __nnull: true } }],
+						_and: [{ _method: { _nnull: true } }],
 						_then: {
 							field: { _eq: 'test-null-match' },
 						},
 					},
 					_elseIf_1: {
-						_and: [{ __tag__: { _eq: 'test-contains-tag' } }],
+						_and: [{ _tag: { _eq: 'test-contains-tag' } }],
 						_then: {
 							field: { _eq: 'test-contains-tag-match' },
 						},
@@ -31,11 +31,11 @@ https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-
 				},
 			],
 	variables: {
-				__method__: {
+				_method: {
 					value: 'foo',
 					type: boolean
 				},
-				__tag__: {
+				_tag: {
 					value: 'bar',
 					type: boolean
 				}
