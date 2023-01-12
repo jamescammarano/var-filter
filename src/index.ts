@@ -1,5 +1,5 @@
 import { defineInterface } from '@directus/extensions-sdk';
-import PannelVarFilter from './var-filter.vue';
+import PannelVarFilter from './filter.vue';
 
 export default defineInterface({
 	id: 'var-filter',

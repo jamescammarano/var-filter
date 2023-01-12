@@ -2,21 +2,13 @@ import { LogicalFilter, FieldFilter } from '@directus/shared/types';
 
 export type Filter = LogicalFilter | FieldFilter | CondtionalFilter;
 
-type CondtionalFilter = CondtionalIfFilter | CondtionalElseIfFilter | CondtionalElseFilter | CondtionalThenFilter;
+type CondtionalFilter = CondtionalWhenFilter | CondtionalThenFilter;
 
-export type CondtionalIfFilter = {
-	_if: Filter[];
+export type CondtionalWhenFilter = {
+	_when: Filter[];
 };
 
-export type CondtionalElseIfFilter = {
-	_elseIf: Filter[];
-};
-
-export type CondtionalElseFilter = {
-	_else: Filter[];
-};
-
-type CondtionalThenFilter = {
+export type CondtionalThenFilter = {
 	_then: Filter[];
 };
 
@@ -35,5 +27,4 @@ export type FilterInfo =
 			name: string;
 			node: Filter;
 			isLogic: boolean;
-			itThen: false;
 	  };

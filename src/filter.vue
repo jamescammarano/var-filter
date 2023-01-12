@@ -5,19 +5,23 @@
 	<v-notice v-else-if="collectionRequired && !collection" type="warning">
 		{{ t('select_a_collection') }}
 	</v-notice>
+
 	<div v-else class="system-filter" :class="{ inline, empty: innerValue.length === 0, field: fieldName !== undefined }">
 		<v-list :mandatory="true">
 			<div v-if="innerValue.length === 0" class="no-rules">
 				{{ t('interfaces.filter.no_rules') }}
 			</div>
+
 			<nodes
 				v-else
-				@remove-node="removeNode($event)"
-				@change="emitValue"
-				@variable="setVariablesArray($event)"
-				:field="fieldName"
 				v-model:filter="innerValue"
 				:collection="collection"
+				:field="fieldName"
+				:depth="1"
+				:include-validation="includeValidation"
+				:include-relations="includeRelations"
+				@remove-node="removeNode($event)"
+				@change="emitValue"
 			/>
 		</v-list>
 
@@ -34,6 +38,7 @@
 						<v-icon name="expand_more" class="expand_more" />
 					</button>
 				</template>
+
 				<v-field-list
 					v-if="collectionRequired"
 					:collection="collection"
@@ -42,48 +47,20 @@
 					@select-field="addNode($event)"
 				>
 					<template #prepend>
-						<v-list-item clickable @click="addNode('$group')">
+						<v-list-item clickable @click="addNode('$condition')">
 							<v-list-item-content>
-								<v-text-overflow :text="t('interfaces.filter.add_group')" />
+								<v-text-overflow :text="t('interfaces.filter.add_condition')" />
 							</v-list-item-content>
 						</v-list-item>
-						<v-divider />
-						<v-list-item clickable @click="addNode('$conditional')">
+						<v-list-item clickable @click="addNode('$condition')">
 							<v-list-item-content>
-								<v-text-overflow text="If / Else If / Else" />
+								<v-text-overflow text="WHEN/THEN" />
 							</v-list-item-content>
 						</v-list-item>
-						<v-list-item clickable @click="addNode('$then')">
-							<v-list-item-content>
-								<v-text-overflow text="Then" />
-							</v-list-item-content>
-						</v-list-item>
-						<!-- v-field-list hates this -->
-						<v-list-group>
-							<template #activator>
-								<v-list-item-content>
-									<v-text-overflow text="Variable" />
-								</v-list-item-content>
-							</template>
-							<v-list-item-content class="width">
-								<v-list-item @click.stop>
-									<v-input type="text" @blur="search = ''" @input="search = $event.target.value" placeholder="Search">
-										<template #append><v-icon name="search" /></template>
-									</v-input>
-								</v-list-item>
-								<v-list-item
-									clickable
-									v-for="dataType in dataTypes"
-									@click="addNode(`$var_${dataType.type}`)"
-									:key="dataType.type"
-								>
-									<v-text-overflow :text="dataType.text" />
-								</v-list-item>
-							</v-list-item-content>
-						</v-list-group>
 						<v-divider />
 					</template>
 				</v-field-list>
+
 				<v-list v-else :mandatory="false">
 					<v-list-item clickable @click="addNode('$group')">
 						<v-list-item-content>
@@ -107,11 +84,8 @@
 	</div>
 </template>
 
-<script setup lang="ts">
-import { computed, inject, onMounted, ref } from 'vue';
+<script lang="ts" setup>
 import { useStores } from '@directus/extensions-sdk';
-import { useI18n } from 'vue-i18n';
-import { cloneDeep, isEmpty, set } from 'lodash';
 import { FieldFunction, Type } from '@directus/shared/types';
 import {
 	getOutputTypeForFunction,
@@ -119,13 +93,11 @@ import {
 	getFilterOperatorsForType,
 	get,
 } from '@directus/shared/utils';
-
-import { Filter } from './types';
-import { getNodeName } from './utils';
-import { REGEX_BETWEEN_HANDLEBARS } from './consts';
-
+import { cloneDeep, isEmpty, set } from 'lodash';
+import { computed, inject, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import Nodes from './nodes.vue';
-import { TYPES } from '@directus/shared/constants';
+import { getNodeName } from './utils';
 
 interface Props {
 	value?: Record<string, any>;
@@ -151,11 +123,11 @@ const props = withDefaults(defineProps<Props>(), {
 	includeRelations: true,
 });
 
-onMounted(() => removeUnusedVars());
-
 const emit = defineEmits(['input']);
+
 const { t } = useI18n();
-const { useFieldsStore, useRelationsStore } = useStores();
+
+const menuEl = ref();
 
 const values = inject('values', ref<Record<string, any>>({}));
 
@@ -164,14 +136,9 @@ const collection = computed(() => {
 	return values.value[props.collectionField] ?? null;
 });
 
+const { useFieldsStore, useRelationsStore } = useStores();
 const fieldsStore = useFieldsStore();
 const relationsStore = useRelationsStore();
-
-const newKey = ref<string | null>(null);
-const menuEl = ref();
-
-const variables = ref<Record<string, any>>({});
-const search = ref<string>('');
 
 const innerValue = computed<Filter[]>({
 	get() {
@@ -181,12 +148,6 @@ const innerValue = computed<Filter[]>({
 
 		if (name === '_and') {
 			return cloneDeep(props.value['_and']);
-			// } else if (name === '_if') {
-			// 	return cloneDeep(props.value['_if']);
-			// } else if (name === '_elseIf') {
-			// 	return cloneDeep(props.value['_elseIf']);
-			// } else if (name === '_else') {
-			// 	return cloneDeep(props.value['_else']);
 		} else {
 			return cloneDeep([props.value]);
 		}
@@ -195,37 +156,28 @@ const innerValue = computed<Filter[]>({
 		if (newVal.length === 0) {
 			emit('input', null);
 		} else {
-			emit('input', { _and: newVal, variables: variables.value });
+			emit('input', { _and: newVal });
 		}
 	},
 });
 
-const dataTypes = computed(() => {
-	return TYPES.filter((type) => type.includes(search.value)).map((type) => {
-		const text = type
-			.replace('.', ': ')
-			.split(/(?=[A-Z])/)
-			.map((word: string) => {
-				return word[0] ? word.replace(word[0], word[0].toUpperCase()) : word;
-			})
-			.join(' ');
-		return {
-			type,
-			text,
-		};
-	});
-});
+function emitValue() {
+	if (innerValue.value.length === 0) {
+		emit('input', null);
+	} else {
+		emit('input', { _and: innerValue.value });
+	}
+}
 
 function addNode(key: string) {
 	if (key === '$group') {
 		innerValue.value = innerValue.value.concat({ _and: [] });
-	} else if (key === '$conditional') {
-		innerValue.value = innerValue.value.concat({ _if: {} });
-	} else if (key === '$then') {
-		innerValue.value = innerValue.value.concat({ _then: {} });
+	} else if (key === '$condition') {
+		innerValue.value = innerValue.value.concat({ _when: [] });
 	} else {
 		let type: Type;
 		const field = fieldsStore.getField(collection.value, key);
+
 		if (key.includes('(') && key.includes(')')) {
 			const functionName = key.split('(')[0] as FieldFunction;
 			type = getOutputTypeForFunction(functionName);
@@ -248,8 +200,9 @@ function addNode(key: string) {
 	}
 }
 
-function removeNode(ids) {
+function removeNode(ids: string[]) {
 	const id = ids.pop();
+
 	if (ids.length === 0) {
 		innerValue.value = innerValue.value.filter((node, index) => index !== Number(id));
 		return;
@@ -262,45 +215,14 @@ function removeNode(ids) {
 	innerValue.value = set(innerValue.value, ids.join('.'), list);
 }
 
+// For adding any new fields (eg. flow Validate operation rule)
+const newKey = ref<string | null>(null);
+
 function addKeyAsNode() {
 	if (!newKey.value) return;
 	if (menuEl.value) menuEl.value.deactivate();
 	addNode(newKey.value);
 	newKey.value = null;
-}
-
-function emitValue() {
-	if (innerValue.value.length === 0) {
-		emit('input', null);
-	} else {
-		emit('input', { _and: innerValue.value, variables: variables.value });
-	}
-}
-
-function setVariablesArray(variable: string) {
-	const match = variable.match(REGEX_BETWEEN_HANDLEBARS);
-	if (match) variables.value[`_${match[1]}`] = variable;
-}
-
-function removeUnusedVars() {
-	// how to remove unused variables but check if used else where?
-	// check on mount for vars that are unused
-	if (!props.value || !props.value['_and'] || !props.value['_variables']) return;
-
-	const { _and, variables } = props.value;
-	const usedVariables = {};
-
-	const matchedVariables = JSON.stringify(_and).matchAll(/"_([^)]+)",/);
-
-	if (matchedVariables === null) return;
-
-	for (const variable in matchedVariables) {
-		usedVariables[`_${variable}`] = `{{ ${variable} }}`;
-	}
-
-	variables.value = usedVariables;
-
-	emit('input', { _and: innerValue.value, variables: usedVariables });
 }
 </script>
 
@@ -403,10 +325,7 @@ function removeUnusedVars() {
 		}
 	}
 }
-// TODO Make this width work
-.width {
-	width: min-content;
-}
+
 .field .buttons {
 	button {
 		color: var(--primary);

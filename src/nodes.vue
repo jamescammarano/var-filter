@@ -1,4 +1,4 @@
-<template #item="{ element, index }">
+<template>
 	<draggable
 		tag="ul"
 		draggable=".row"
@@ -16,58 +16,31 @@
 				<div v-if="filterInfo[index].isField" block class="node field">
 					<div class="header" :class="{ inline }">
 						<v-icon name="drag_indicator" class="drag-handle" small></v-icon>
-						<div v-if="!filterInfo[index].isVarField">
-							<span v-if="!isExistingField(element)" class="plain-name">
-								{{ getFieldPreview(element) }}
-							</span>
-							<v-menu v-else placement="bottom-start" show-arrow>
-								<template #activator="{ toggle }">
-									<button class="name" @click="toggle">
-										<span>{{ getFieldPreview(element) }}</span>
-									</button>
-								</template>
-								<v-field-list
-									:collection="collection"
-									:field="field"
-									include-functions
-									:include-relations="includeRelations"
-									@select-field="updateField(index, $event)"
-								/>
-							</v-menu>
-							<v-select
-								inline
-								class="comparator"
-								placement="bottom-start"
-								:model-value="filterInfo[index].comparator"
-								:items="getCompareOptions(filterInfo[index].field)"
-								@update:model-value="updateComparator(index, $event)"
+						<span v-if="!isExistingField(element)" class="plain-name">{{ getFieldPreview(element) }}</span>
+						<v-menu v-else placement="bottom-start" show-arrow>
+							<template #activator="{ toggle }">
+								<button class="name" @click="toggle">
+									<span>{{ getFieldPreview(element) }}</span>
+								</button>
+							</template>
+
+							<v-field-list
+								:collection="collection"
+								:field="field"
+								include-functions
+								:include-relations="includeRelations"
+								@select-field="updateField(index, $event)"
 							/>
-						</div>
-						<div v-else>
-							<input-component
-								:style="{ width }"
-								is="interface-input"
-								ref="varInputEl"
-								type="text"
-								:value="variable"
-								placeholder="{{  }}"
-								@input="setVarName(index, $event)"
-							/>
-							<v-select
-								inline
-								class="comparator"
-								placement="bottom-start"
-								:items="getCompareOptions(filterInfo[index].field)"
-								:model-value="filterInfo[index].comparator"
-								@update:model-value="updateComparator(index, $event)"
-							/>
-						</div>
-						<input-group
-							:field="element"
-							:focus="!filterInfo[index].isVarField"
-							:collection="collection"
-							@update:field="replaceNode(index, $event)"
+						</v-menu>
+						<v-select
+							inline
+							class="comparator"
+							placement="bottom-start"
+							:model-value="filterInfo[index].comparator"
+							:items="getCompareOptions(filterInfo[index].field)"
+							@update:model-value="updateComparator(index, $event)"
 						/>
+						<input-group :field="element" :collection="collection" @update:field="replaceNode(index, $event)" />
 						<span class="delete">
 							<v-icon
 								v-tooltip="t('delete_label')"
@@ -79,16 +52,13 @@
 						</span>
 					</div>
 				</div>
+
 				<div v-else-if="filterInfo[index].isLogic" class="node logic">
 					<div class="header" :class="{ inline }">
 						<v-icon name="drag_indicator" class="drag-handle" small />
 						<div class="logic-type" :class="{ or: filterInfo[index].name === '_or' }">
 							<span class="key" @click="toggleLogic(index)">
-								{{
-									filterInfo[index].name === '_and'
-										? t('interfaces.filter.logic_type_and')
-										: t('interfaces.filter.logic_type_or')
-								}}
+								{{ filterInfo[index].name === '_and' ? 'AND' : 'OR' }}
 							</span>
 							<span class="text">
 								{{
@@ -119,21 +89,21 @@
 					/>
 				</div>
 				<div v-else class="node conditional">
-					<div v-if="!filterInfo[index].isThen" class="header" :class="{ inline }">
+					<div class="header" :class="{ inline }">
 						<v-icon name="drag_indicator" class="drag-handle" small />
-						<div
-							class="conditional-type"
-							:class="{ elseIf: filterInfo[index].name === '_elseIf', _else: filterInfo[index].name === '_else' }"
-						>
+						<!-- TODO styling -->
+						<div class="conditional-type" :class="{ then: filterInfo[index].name === '_then' }">
 							<span class="key" @click="toggleCondtions(index)">
-								{{
-									filterInfo[index].name === '_elseIf'
-										? 'ELSE IF'
-										: filterInfo[index].name.substring(1).toLocaleUpperCase()
-								}}
+								<!-- TODO Transations -->
+								{{ filterInfo[index].name === '_when' ? 'WHEN' : 'THEN' }}
 							</span>
 							<span class="text">
-								{{ getConditionalText(filterInfo[index].name) }}
+								<!-- TODO Description text -->
+								<!-- {{
+									`— ${
+										filterInfo[index].name === '_and' ? t('interfaces.filter.all') : t('interfaces.filter.any')
+									} ${t('interfaces.filter.of_the_following')}`
+								}} -->
 							</span>
 						</div>
 						<span class="delete">
@@ -146,23 +116,7 @@
 							/>
 						</span>
 					</div>
-					<div v-else class="header" :class="{ inline }">
-						<v-icon name="drag_indicator" class="drag-handle" small />
-						<div class="conditional-type then">
-							<span class="key">THEN</span>
-							<span class="text">— Use these filters when conditions are true</span>
-						</div>
-						<span class="delete">
-							<v-icon
-								v-tooltip="t('delete_label')"
-								name="close"
-								small
-								clickable
-								@click="$emit('remove-node', [index])"
-							/>
-						</span>
-					</div>
-					<!-- <nodes
+					<nodes
 						:filter="element[filterInfo[index].name]"
 						:collection="collection"
 						:depth="depth + 1"
@@ -170,22 +124,16 @@
 						@change="$emit('change')"
 						@remove-node="$emit('remove-node', [`${index}.${filterInfo[index].name}`, ...$event])"
 						@update:filter="replaceNode(index, { [filterInfo[index].name]: $event })"
-					/> -->
+					/>
 				</div>
 			</li>
 		</template>
 	</draggable>
 </template>
 
-<script setup lang="ts">
-import { computed, ref } from 'vue';
-import draggable from 'vuedraggable';
-import { get } from 'lodash';
-import { useI18n } from 'vue-i18n';
-
+<script lang="ts" setup>
 import { useSync } from '@directus/shared/composables';
 import { useStores } from '@directus/extensions-sdk';
-import { getFilterOperatorsForType, getOutputTypeForFunction, toArray } from '@directus/shared/utils';
 import {
 	FieldFilter,
 	FieldFilterOperator,
@@ -193,12 +141,30 @@ import {
 	LogicalFilterOR,
 	Type,
 } from '@directus/shared/dist/esm/types';
+import { getFilterOperatorsForType, getOutputTypeForFunction, toArray } from '@directus/shared/utils';
+import { get } from 'lodash';
+import { computed, toRefs } from 'vue';
+import { useI18n } from 'vue-i18n';
+import Draggable from 'vuedraggable';
+import InputGroup from './input-group.vue';
+import { fieldToFilter, getComparator, getField, getNodeName } from './utils';
+import { Filter } from './types';
 
-import { CondtionalElseFilter, CondtionalElseIfFilter, CondtionalIfFilter, Filter, FilterInfo } from './types';
-import { extractFieldFromFunction, fieldToFilter, getComparator, getField, getNodeName } from './utils';
-import { CONDITIONALS, LOGIC, REGEX_BETWEEN_HANDLEBARS } from './consts';
-import InputGroup from './inputs/input-group.vue';
-import inputComponent from './inputs/input-component.vue';
+type FilterInfo =
+	| {
+			id: number;
+			isField: true;
+			name: string;
+			node: Filter;
+			field: string;
+			comparator: string;
+	  }
+	| {
+			id: number;
+			isField: false;
+			name: string;
+			node: Filter;
+	  };
 
 interface Props {
 	filter: Filter[];
@@ -218,26 +184,21 @@ const props = withDefaults(defineProps<Props>(), {
 	includeRelations: true,
 });
 
-const emit = defineEmits(['remove-node', 'update:filter', 'change', 'variable']);
+const emit = defineEmits(['remove-node', 'update:filter', 'change']);
 
-const { t } = useI18n();
-
+const { collection } = toRefs(props);
+const filterSync = useSync(props, 'filter', emit);
 const { useFieldsStore, useRelationsStore } = useStores();
 const fieldsStore = useFieldsStore();
 const relationsStore = useRelationsStore();
-
-const filterSync = useSync(props, 'filter', emit);
+const { t } = useI18n();
 
 const filterInfo = computed<FilterInfo[]>({
 	get() {
 		return props.filter.map((node, id) => {
 			const name = getNodeName(node);
-
 			const isField = name.startsWith('_') === false;
-			const isLogic = LOGIC.includes(name);
-			const isThen = name === '_then';
-			const isVarField = name.startsWith('$var') || (!isField && !isLogic && !CONDITIONALS.includes(name));
-			const isUnsetVar = isVarField && name?.match(REGEX_BETWEEN_HANDLEBARS) === null;
+			const isLogic = ['_and', '_or'].includes(name);
 
 			return isField
 				? {
@@ -245,11 +206,10 @@ const filterInfo = computed<FilterInfo[]>({
 						isField,
 						name,
 						field: getField(node),
-						comparator: getComparator(node, isUnsetVar),
+						comparator: getComparator(node),
 						node,
-						isVarField,
 				  }
-				: { id, name, isField, node, isLogic, isThen };
+				: { id, name, isField, node, isLogic };
 		});
 	},
 	set(newVal) {
@@ -259,37 +219,6 @@ const filterInfo = computed<FilterInfo[]>({
 		);
 	},
 });
-
-const variable = ref<string>('');
-const varInputEl = ref<HTMLElement>();
-
-const width = computed(() => {
-	return (variable.value?.length || 5) + 2 + 'ch';
-});
-
-function toggleLogic(index: number) {
-	const nodeInfo = filterInfo.value[index];
-
-	if (filterInfo.value[index].isField) return;
-
-	if ('_and' in nodeInfo.node) {
-		filterSync.value = filterSync.value.map((filter, filterIndex) => {
-			if (filterIndex === index) {
-				return { _or: (nodeInfo.node as LogicalFilterAND)._and as FieldFilter[] };
-			}
-
-			return filter;
-		});
-	} else {
-		filterSync.value = filterSync.value.map((filter, filterIndex) => {
-			if (filterIndex === index) {
-				return { _and: (nodeInfo.node as LogicalFilterOR)._or as FieldFilter[] };
-			}
-
-			return filter;
-		});
-	}
-}
 
 function getFieldPreview(node: Record<string, any>) {
 	const fieldKey = getField(node);
@@ -323,60 +252,56 @@ function getFieldPreview(node: Record<string, any>) {
 	return fieldNames.join(' -> ');
 }
 
-function updateField(index: number, newField: string) {
+function getIndex(item: Filter) {
+	return props.filter.findIndex((filter) => filter === item);
+}
+
+function toggleLogic(index: number) {
 	const nodeInfo = filterInfo.value[index];
-	const oldFieldInfo = fieldsStore.getField(props.collection, nodeInfo.name);
-	const newFieldInfo = fieldsStore.getField(props.collection, newField);
 
-	if (nodeInfo.isField === false) return;
+	if (filterInfo.value[index].isField) return;
 
-	const valuePath = nodeInfo.field + '.' + nodeInfo.comparator;
-	let value = get(nodeInfo.node, valuePath);
-	let comparator = nodeInfo.comparator;
-
-	if (oldFieldInfo?.type !== newFieldInfo?.type) {
-		value = null;
-		comparator = getCompareOptions(newField)[0].value;
-	}
-
-	filterSync.value = filterSync.value.map((filter, filterIndex) => {
-		if (filterIndex === index) return fieldToFilter(newField, comparator, value);
-		return filter;
-	});
-}
-
-function replaceNode(index: number, newFilter: Filter) {
-	filterSync.value = filterSync.value.map((val, filterIndex) => {
-		if (filterIndex === index) return newFilter;
-		return val;
-	});
-}
-
-function getCompareOptions(name: string) {
-	let type: Type;
-	console.log(name);
-
-	if (name.startsWith('$var')) {
-		type = name.substring(5) as Type;
-	} else if (name.includes('(') && name.includes(')')) {
-		const functionName = name.split('(')[0];
-		type = getOutputTypeForFunction(functionName);
-	} else {
-		const fieldInfo = fieldsStore.getField(props.collection, name);
-		type = fieldInfo?.type || 'unknown';
-
-		// Alias uses the foreign key type
-		if (type === 'alias') {
-			const relations = relationsStore.getRelationsForField(props.collection, name);
-			if (relations[0]) {
-				type = fieldsStore.getField(relations[0].collection, relations[0].field)?.type || 'unknown';
+	if ('_and' in nodeInfo.node) {
+		filterSync.value = filterSync.value.map((filter, filterIndex) => {
+			if (filterIndex === index) {
+				return { _or: (nodeInfo.node as LogicalFilterAND)._and as FieldFilter[] };
 			}
-		}
+
+			return filter;
+		});
+	} else {
+		filterSync.value = filterSync.value.map((filter, filterIndex) => {
+			if (filterIndex === index) {
+				return { _and: (nodeInfo.node as LogicalFilterOR)._or as FieldFilter[] };
+			}
+
+			return filter;
+		});
 	}
-	return getFilterOperatorsForType(type, { includeValidation: props.includeValidation }).map((type) => ({
-		text: t(`operators.${type}`),
-		value: `_${type}`,
-	}));
+}
+
+function toggleCondtions(index: number) {
+	const nodeInfo = filterInfo.value[index];
+
+	if (filterInfo.value[index].isField) return;
+
+	if ('_when' in nodeInfo.node) {
+		filterSync.value = filterSync.value.map((filter, filterIndex) => {
+			if (filterIndex === index) {
+				return { _then: (nodeInfo.node as LogicalFilterAND)._when as FieldFilter[] };
+			}
+
+			return filter;
+		});
+	} else {
+		filterSync.value = filterSync.value.map((filter, filterIndex) => {
+			if (filterIndex === index) {
+				return { _when: (nodeInfo.node as LogicalFilterOR)._then as FieldFilter[] };
+			}
+
+			return filter;
+		});
+	}
 }
 
 function updateComparator(index: number, operator: keyof FieldFilterOperator) {
@@ -431,8 +356,58 @@ function updateComparator(index: number, operator: keyof FieldFilterOperator) {
 	}
 }
 
-function getIndex(item: Filter) {
-	return props.filter.findIndex((filter) => filter === item);
+function updateField(index: number, newField: string) {
+	const nodeInfo = filterInfo.value[index];
+	const oldFieldInfo = fieldsStore.getField(props.collection, nodeInfo.name);
+	const newFieldInfo = fieldsStore.getField(props.collection, newField);
+
+	if (nodeInfo.isField === false) return;
+
+	const valuePath = nodeInfo.field + '.' + nodeInfo.comparator;
+	let value = get(nodeInfo.node, valuePath);
+	let comparator = nodeInfo.comparator;
+
+	if (oldFieldInfo?.type !== newFieldInfo?.type) {
+		value = null;
+		comparator = getCompareOptions(newField)[0].value;
+	}
+
+	filterSync.value = filterSync.value.map((filter, filterIndex) => {
+		if (filterIndex === index) return fieldToFilter(newField, comparator, value);
+		return filter;
+	});
+}
+
+function replaceNode(index: number, newFilter: Filter) {
+	filterSync.value = filterSync.value.map((val, filterIndex) => {
+		if (filterIndex === index) return newFilter;
+		return val;
+	});
+}
+
+function getCompareOptions(name: string) {
+	let type: Type;
+
+	if (name.includes('(') && name.includes(')')) {
+		const functionName = name.split('(')[0];
+		type = getOutputTypeForFunction(functionName);
+	} else {
+		const fieldInfo = fieldsStore.getField(props.collection, name);
+		type = fieldInfo?.type || 'unknown';
+
+		// Alias uses the foreign key type
+		if (type === 'alias') {
+			const relations = relationsStore.getRelationsForField(props.collection, name);
+			if (relations[0]) {
+				type = fieldsStore.getField(relations[0].collection, relations[0].field)?.type || 'unknown';
+			}
+		}
+	}
+
+	return getFilterOperatorsForType(type, { includeValidation: props.includeValidation }).map((type) => ({
+		text: t(`operators.${type}`),
+		value: `_${type}`,
+	}));
 }
 
 function isExistingField(node: Record<string, any>): boolean {
@@ -440,57 +415,6 @@ function isExistingField(node: Record<string, any>): boolean {
 	const fieldKey = getField(node);
 	const field = fieldsStore.getField(props.collection, fieldKey);
 	return !!field;
-}
-
-function getConditionalText(nodeName) {
-	if (nodeName === '_if') {
-		return `— Conditionally filter on variables`;
-	}
-	// TODO text for else and elseif?
-	return '';
-}
-
-function toggleCondtions(index: number) {
-	const nodeInfo = filterInfo.value[index];
-
-	if (filterInfo.value[index].isField) return;
-	if (filterInfo.value[index].isLogic) return;
-
-	if ('_if' in nodeInfo.node) {
-		filterSync.value = filterSync.value.map((filter, filterIndex) => {
-			if (filterIndex === index) {
-				return { _elseIf: (nodeInfo.node as CondtionalElseIfFilter)._elseIf as FieldFilter[] };
-			}
-
-			return filter;
-		});
-	} else if ('_elseIf' in nodeInfo.node) {
-		filterSync.value = filterSync.value.map((filter, filterIndex) => {
-			if (filterIndex === index) {
-				return { _else: (nodeInfo.node as CondtionalElseFilter)._else as FieldFilter[] };
-			}
-
-			return filter;
-		});
-	} else {
-		filterSync.value = filterSync.value.map((filter, filterIndex) => {
-			if (filterIndex === index) {
-				return { _if: (nodeInfo.node as CondtionalIfFilter)._if as FieldFilter[] };
-			}
-
-			return filter;
-		});
-	}
-}
-
-function setVarName(index: number, value: string) {
-	variable.value = value;
-	const match = variable.value.match(REGEX_BETWEEN_HANDLEBARS);
-
-	if (match !== null && match[1]) {
-		emit('variable', variable.value);
-		filterInfo[index].name = '_' + match[1].trim();
-	}
 }
 </script>
 
@@ -555,30 +479,12 @@ function setVarName(index: number, value: string) {
 			}
 		}
 
-		&.else-if .key {
+		&.then .key {
 			color: var(--secondary);
 			background-color: var(--secondary-alt);
 
 			&:hover {
 				background-color: var(--secondary-25);
-			}
-		}
-		&.else .key {
-			color: var(--orange);
-			background-color: var(--orange-alt);
-
-			&:hover {
-				background-color: var(--orange-25);
-			}
-		}
-		&.then {
-			.else .key {
-				color: var(--orange);
-				background-color: var(--orange-alt);
-
-				&:hover {
-					background-color: var(--orange-25);
-				}
 			}
 		}
 	}
@@ -683,6 +589,11 @@ function setVarName(index: number, value: string) {
 		white-space: nowrap;
 	}
 
+	&.conditional {
+		padding-right: 4px;
+		white-space: nowrap;
+	}
+
 	&.field {
 		padding-right: 4px;
 	}
@@ -695,22 +606,6 @@ function setVarName(index: number, value: string) {
 
 		> * {
 			opacity: 0;
-		}
-	}
-}
-
-.input {
-	display: flex;
-	align-items: center;
-
-	.v-icon {
-		margin-right: 8px;
-		margin-left: 12px;
-		color: var(--foreground-subdued);
-		cursor: pointer;
-
-		&:hover {
-			color: var(--danger);
 		}
 	}
 }

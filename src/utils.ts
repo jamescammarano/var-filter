@@ -1,6 +1,5 @@
 import { get, isPlainObject } from 'lodash';
-import { FieldFunction } from '@directus/shared/types';
-import { Filter } from './types';
+import { Filter } from '@directus/shared/types';
 
 export function getNodeName(node: Filter): string {
 	if (!node) return '';
@@ -16,8 +15,7 @@ export function getField(node: Record<string, any>): string {
 	return subFields !== '' ? `${name}.${subFields}` : name;
 }
 
-export function getComparator(node: Record<string, any>, isUnsetVar: boolean = false): string {
-	if (isUnsetVar) return '_eq';
+export function getComparator(node: Record<string, any>): string {
 	return getNodeName(get(node, getField(node)));
 }
 
@@ -38,15 +36,4 @@ export function fieldToFilter(field: string, operator: string, value: any): Reco
 			};
 		}
 	}
-}
-
-export function extractFieldFromFunction(fieldKey: string): { fn: FieldFunction | null; field: string } {
-	let functionName;
-
-	if (fieldKey.includes('(') && fieldKey.includes(')')) {
-		functionName = fieldKey.split('(')[0] as FieldFunction | undefined;
-		fieldKey = fieldKey.match(/\(([^)]+)\)/)![1];
-	}
-
-	return { fn: functionName ?? null, field: fieldKey };
 }
