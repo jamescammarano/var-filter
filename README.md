@@ -8,41 +8,79 @@ Otherwise everything the user inputs, even accidentally, stays in the variable a
 Another change from the original proposal is changing the variable object to be able to load the correct type
 comparators.
 
-https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-9c29-906b073000f5.mov
+https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-9c29-906b073000f5.mov Keys:
+`['_when_', '_then']`
 
-## The shape of Filter
+<img width="344" alt="Screenshot 2023-01-16 at 7 04 05 AM" src="https://user-images.githubusercontent.com/67079013/212675300-d8981bca-ef27-478a-8a12-de47439b4985.png">
 
-```javascript
+<img width="478" alt="Screenshot 2023-01-16 at 7 03 56 AM" src="https://user-images.githubusercontent.com/67079013/212675301-58fd4d9f-b8f0-44cd-80d4-d59b6f1d1d80.png">
+
+```json
 {
-    "_and": [
-        {
-            "_when": [
-                {
-                    "user_created": {
-                        "first_name": {
-                            "_contains": "Jay"
-                        }
-                    }
-                },
-                {
-                    "_then": [
-                        {
-                            "status": {
-                                "_eq": "published"
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
+	"_and": [
+		{
+			"_when": [
+				{
+					"status": {
+						"_eq": "draft"
+					}
+				},
+				{
+					"_then": [
+						{
+							"title": {
+								"_eq": "Article 1"
+							}
+						}
+					]
+				}
+			]
+		}
+	]
 }
 ```
 
-## Parsing the object
+<img width="478" alt="Screenshot 2023-01-16 at 7 05 11 AM" src="https://user-images.githubusercontent.com/67079013/212675298-9651bd33-c917-46ce-a431-b92b463bf840.png">
 
-The parser is found in `shared/` because I was sharing it with other extensions in a different repository. It currently
-only parses the root level. I also need to add all comparators to `evaluateBranch(...)`.
+```json
+{
+	"_and": [
+		{
+			"_when": [
+				{
+					"_and": [
+						{
+							"user_created": {
+								"first_name": {
+									"_contains": "Jay"
+								}
+							}
+						},
+						{
+							"title": {
+								"_eq": "Article 1"
+							}
+						}
+					]
+				},
+				{
+					"_then": [
+						{
+							"status": {
+								"_eq": "published"
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}
+```
+
+## Next Steps
+
+- Add "\_when" and "\_then" to graphql and filter parser?
 
 ## To Do:
 
