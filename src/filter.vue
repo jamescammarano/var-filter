@@ -47,14 +47,15 @@
 					@select-field="addNode($event)"
 				>
 					<template #prepend>
-						<v-list-item clickable @click="addNode('$condition')">
+						<v-list-item clickable @click="addNode('$group')">
 							<v-list-item-content>
-								<v-text-overflow :text="t('interfaces.filter.add_condition')" />
+								<v-text-overflow :text="t('interfaces.filter.add_group')" />
 							</v-list-item-content>
 						</v-list-item>
 						<v-list-item clickable @click="addNode('$condition')">
 							<v-list-item-content>
-								<v-text-overflow text="WHEN/THEN" />
+								<!-- TODO add translation -->
+								<v-text-overflow text="When / Then" />
 							</v-list-item-content>
 						</v-list-item>
 						<v-divider />

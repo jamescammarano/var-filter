@@ -14,33 +14,29 @@ https://user-images.githubusercontent.com/67079013/211628348-f920c197-b595-483a-
 
 ```javascript
 {
-    _and: [
-				{
-					_if: {
-						_and: [{ _method: { _nnull: true } }],
-						_then: {
-							field: { _eq: 'test-null-match' },
-						},
-					},
-					_elseIf_1: {
-						_and: [{ _tag: { _eq: 'test-contains-tag' } }],
-						_then: {
-							field: { _eq: 'test-contains-tag-match' },
-						},
-					},
-				},
-			],
-	variables: {
-				_method: {
-					value: 'foo',
-					type: boolean
-				},
-				_tag: {
-					value: 'bar',
-					type: boolean
-				}
-		},
-};
+    "_and": [
+        {
+            "_when": [
+                {
+                    "user_created": {
+                        "first_name": {
+                            "_contains": "Jay"
+                        }
+                    }
+                },
+                {
+                    "_then": [
+                        {
+                            "status": {
+                                "_eq": "published"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
 ```
 
 ## Parsing the object

@@ -92,7 +92,7 @@
 					<div class="header" :class="{ inline }">
 						<v-icon name="drag_indicator" class="drag-handle" small />
 						<!-- TODO styling -->
-						<div class="conditional-type" :class="{ then: filterInfo[index].name === '_then' }">
+						<div class="conditional-type" :class="{ _then: filterInfo[index].name === '_then' }">
 							<span class="key" @click="toggleCondtions(index)">
 								<!-- TODO Transations -->
 								{{ filterInfo[index].name === '_when' ? 'WHEN' : 'THEN' }}
@@ -147,8 +147,8 @@ import { computed, toRefs } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Draggable from 'vuedraggable';
 import InputGroup from './input-group.vue';
-import { fieldToFilter, getComparator, getField, getNodeName } from './utils';
-import { Filter } from './types';
+import { extractFieldFromFunction, fieldToFilter, getComparator, getField, getNodeName } from './utils';
+import { CondtionalThenFilter, CondtionalWhenFilter, Filter } from './types';
 
 type FilterInfo =
 	| {
@@ -288,7 +288,7 @@ function toggleCondtions(index: number) {
 	if ('_when' in nodeInfo.node) {
 		filterSync.value = filterSync.value.map((filter, filterIndex) => {
 			if (filterIndex === index) {
-				return { _then: (nodeInfo.node as LogicalFilterAND)._when as FieldFilter[] };
+				return { _then: (nodeInfo.node as CondtionalWhenFilter)._when as FieldFilter[] };
 			}
 
 			return filter;
@@ -296,7 +296,7 @@ function toggleCondtions(index: number) {
 	} else {
 		filterSync.value = filterSync.value.map((filter, filterIndex) => {
 			if (filterIndex === index) {
-				return { _when: (nodeInfo.node as LogicalFilterOR)._then as FieldFilter[] };
+				return { _when: (nodeInfo.node as CondtionalThenFilter)._then as FieldFilter[] };
 			}
 
 			return filter;
