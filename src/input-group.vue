@@ -79,8 +79,7 @@ import { clone, get } from 'lodash';
 import { useStores } from '@directus/extensions-sdk';
 import { FieldFilter } from '@directus/shared/types';
 
-import { fieldToFilter, getComparator, getField, getNodeName } from '../utils';
-import { REGEX_BETWEEN_UNDERSCORES } from '../consts';
+import { fieldToFilter, getComparator, getField, getNodeName } from './utils';
 import InputComponent from './input-component.vue';
 
 interface Props {
